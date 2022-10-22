@@ -24,10 +24,9 @@ public class PlaceType {
 
     }
 
-    public PlaceType(long id, String name, Set<PlaceType> placeTypeSet) {
+    public PlaceType(long id, String name) {
         this.id = id;
         this.name = name;
-        this.placeTypeSet = placeTypeSet;
     }
 
     public long getId() {
@@ -59,7 +58,6 @@ public class PlaceType {
         return "PlaceType{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", placeTypeSet=" + placeTypeSet +
                 '}';
     }
 }
