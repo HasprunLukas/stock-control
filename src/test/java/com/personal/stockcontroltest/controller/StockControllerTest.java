@@ -3,8 +3,10 @@ package com.personal.stockcontroltest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.stockcontroltest.model.PlaceType;
 import com.personal.stockcontroltest.model.Stock;
+import com.personal.stockcontroltest.model.StockType;
 import com.personal.stockcontroltest.repository.PlaceTypeRepository;
 import com.personal.stockcontroltest.repository.StockRepository;
+import com.personal.stockcontroltest.repository.StockTypeRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class StockControllerTest {
     private static final String placeTypeTestNaming = "TestPlaceType";
-    private static final String stockTypeTestNaming = "TestStock";
+    private static final String stockTypeTestNaming = "TestStockType";
+    private static final String stockTestNaming = "TestStock";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -35,6 +38,8 @@ public class StockControllerTest {
     private StockRepository stockRepository;
     @Autowired
     private PlaceTypeRepository placeTypeRepository;
+    @Autowired
+    private StockTypeRepository stockTypeRepository;
 
     @After
     public void tearDown() {
@@ -69,9 +74,10 @@ public class StockControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + stockTypeTestNaming))
+                .andExpect(jsonPath("$.name").value(testType + stockTestNaming))
                 .andExpect(jsonPath("$.checkup_date").value(stock.getCheckup_date().toString()))
                 .andExpect(jsonPath("$.placeType.name").value(testType + placeTypeTestNaming))
+                .andExpect(jsonPath("$.stockType.name").value(testType + stockTypeTestNaming))
                 .andExpect(jsonPath("$.placeType.id").isNotEmpty())
                 .andReturn();
     }
@@ -89,7 +95,7 @@ public class StockControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + stockTypeTestNaming))
+                .andExpect(jsonPath("$.name").value(testType + stockTestNaming))
                 .andExpect(jsonPath("$.checkup_date").value(stock.getCheckup_date().toString()))
                 .andExpect(jsonPath("$.placeType.id").isNotEmpty())
                 .andReturn();
@@ -104,6 +110,7 @@ public class StockControllerTest {
         updatedStock.setName("updateTestStockModified");
         updatedStock.setCheckup_date(stock.getCheckup_date());
         updatedStock.setPlaceType(stock.getPlaceType());
+        updatedStock.setStockType(stock.getStockType());
 
         this.mockMvc
                 .perform(put("/stock/" + stock.getId())
@@ -139,13 +146,23 @@ public class StockControllerTest {
         placeType.setName(testType + placeTypeTestNaming);
         placeTypeRepository.save(placeType);
 
+        StockType stockType = new StockType();
+        stockType.setName(testType + stockTypeTestNaming);
+        stockTypeRepository.save(stockType);
+
         Stock stock = new Stock();
-        stock.setName(testType + stockTypeTestNaming);
+        stock.setName(testType + stockTestNaming);
         Date date = new Date(System.currentTimeMillis());
         stock.setCheckup_date(date);
+
         PlaceType placeTypeNew = new PlaceType();
         placeTypeNew.setId(placeType.getId());
+
+        StockType stockTypeNew = new StockType();
+        stockTypeNew.setId(stockType.getId());
+
         stock.setPlaceType(placeTypeNew);
+        stock.setStockType(stockTypeNew);
         if(saveStock) stockRepository.save(stock);
 
         return stock;

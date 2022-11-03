@@ -24,15 +24,21 @@ public class Stock {
     @JoinColumn(name = "place_type_id")
     private PlaceType placeType;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock_type_id")
+    private StockType stockType;
+
     public Stock() {
 
     }
 
-    public Stock(long id, String name, Date checkup_date, PlaceType placeType) {
+    public Stock(long id, String name, Date checkup_date, PlaceType placeType, StockType stockType) {
         this.id = id;
         this.name = name;
         this.checkup_date = checkup_date;
         this.placeType = placeType;
+        this.stockType = stockType;
     }
 
     public long getId() {
@@ -66,6 +72,13 @@ public class Stock {
     public void setPlaceType(PlaceType placeType) {
         this.placeType = placeType;
     }
+    public StockType getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(StockType stockType) {
+        this.stockType = stockType;
+    }
 
     @Override
     public String toString() {
@@ -74,6 +87,7 @@ public class Stock {
                 ", name='" + name + '\'' +
                 ", checkup_date=" + checkup_date +
                 ", placeType=" + placeType +
+                ", stockType=" + stockType +
                 '}';
     }
 }

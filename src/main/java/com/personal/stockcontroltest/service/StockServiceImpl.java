@@ -5,6 +5,7 @@ import com.personal.stockcontroltest.exception.ResourceNotFoundException;
 import com.personal.stockcontroltest.model.Stock;
 import com.personal.stockcontroltest.repository.PlaceTypeRepository;
 import com.personal.stockcontroltest.repository.StockRepository;
+import com.personal.stockcontroltest.repository.StockTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -19,6 +20,8 @@ public class StockServiceImpl implements StockService {
     StockRepository stockRepository;
     @Autowired
     PlaceTypeRepository placeTypeRepository;
+    @Autowired
+    StockTypeRepository stockTypeRepository;
 
     @Override
     public List<Stock> getAllStock() {
@@ -43,6 +46,9 @@ public class StockServiceImpl implements StockService {
         placeTypeRepository.findById(stock.getPlaceType().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Place type with id: " + stock.getPlaceType().getId() + " not found"));
 
+        stockTypeRepository.findById(stock.getStockType().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Stock type with id: " + stock.getStockType().getId() + " not found"));
+
         return stockRepository.save(stock);
     }
 
@@ -58,6 +64,9 @@ public class StockServiceImpl implements StockService {
         placeTypeRepository.findById(stock.getPlaceType().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Place type with id: " + stock.getPlaceType().getId() + " not found"));
 
+        stockTypeRepository.findById(stock.getStockType().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Stock type with id: " + stock.getStockType().getId() + " not found"));
+
         if(stock.getName() != null && !stock.getName().trim().isEmpty()) {
             stockToUpdate.setName(stock.getName());
         }
@@ -65,6 +74,7 @@ public class StockServiceImpl implements StockService {
             stockToUpdate.setCheckup_date(stock.getCheckup_date());
         }
         stockToUpdate.setPlaceType(stock.getPlaceType());
+        stockToUpdate.setStockType(stock.getStockType());
 
         return stockRepository.save(stockToUpdate);
     }
