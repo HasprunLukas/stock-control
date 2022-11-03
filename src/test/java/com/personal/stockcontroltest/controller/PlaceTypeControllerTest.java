@@ -1,4 +1,4 @@
-package com.personal.stockcontroltest;
+package com.personal.stockcontroltest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.stockcontroltest.model.PlaceType;
@@ -23,8 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class PlaceTypeIntegrationTest {
-
+public class PlaceTypeControllerTest {
+    private static final String placeTypeTestNaming = "TestPlaceType";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -39,10 +39,9 @@ public class PlaceTypeIntegrationTest {
 
     @Test
     public void getAllTest() throws Exception {
-        PlaceType placeType = new PlaceType();
-        placeType.setName("getAllTest");
-
-        placeTypeRepository.save(placeType);
+        String testType = "getAll";
+        createPlaceType(testType, true);
+        createPlaceType(testType + 2, true);
 
         this.mockMvc
                 .perform(get("/place_type")
@@ -50,32 +49,31 @@ public class PlaceTypeIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$.length()").value(2))
+                .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andReturn();
     }
 
     @Test
     public void getByIdTest() throws Exception {
-        PlaceType placeType = new PlaceType();
-        placeType.setName("getByIdTest");
-
-        PlaceType savedPlaceType = placeTypeRepository.save(placeType);
+        String testType = "getById";
+        PlaceType placeType = createPlaceType(testType, true);
 
         this.mockMvc
-                .perform(get("/place_type/" + savedPlaceType.getId())
+                .perform(get("/place_type/" + placeType.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("getByIdTest"))
                 .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.name").value(testType + placeTypeTestNaming))
                 .andReturn();
     }
 
     @Test
     public void createTest() throws Exception {
-        PlaceType placeType = new PlaceType();
-        placeType.setName("createTest");
+        String testType = "create";
+        PlaceType placeType = createPlaceType(testType, false);
 
         this.mockMvc
                 .perform(post("/place_type")
@@ -84,39 +82,35 @@ public class PlaceTypeIntegrationTest {
                         .content(objectMapper.writeValueAsString(placeType))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("createTest"))
                 .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.name").value(testType + placeTypeTestNaming))
                 .andReturn();
     }
 
     @Test
     public void updateTest() throws Exception {
-        PlaceType placeType = new PlaceType();
-        placeType.setName("updateTest");
-
-        PlaceType savedPlaceType = placeTypeRepository.save(placeType);
+        String testType = "update";
+        PlaceType placeType = createPlaceType(testType, true);
 
         PlaceType updatedPlaceType = new PlaceType();
-        updatedPlaceType.setName("updateTestModified");
+        updatedPlaceType.setName("updateTestStockModified");
 
         this.mockMvc
-                .perform(put("/place_type/" + savedPlaceType.getId())
+                .perform(put("/place_type/" + placeType.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedPlaceType))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("updateTestModified"))
                 .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.name").value("updateTestStockModified"))
                 .andReturn();
     }
 
     @Test
     public void deleteTest() throws Exception {
-        PlaceType placeType = new PlaceType();
-        placeType.setName("deleteTest");
-
-        placeTypeRepository.save(placeType);
+        String testType = "delete";
+        createPlaceType(testType, true);
 
         String tempId = String.valueOf(placeTypeRepository.findAll().get(0).getId());
 
@@ -127,5 +121,13 @@ public class PlaceTypeIntegrationTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn();
+    }
+
+    private PlaceType createPlaceType(String testType, Boolean savePlaceType) {
+        PlaceType placeType = new PlaceType();
+        placeType.setName(testType + placeTypeTestNaming);
+        if(savePlaceType) placeTypeRepository.save(placeType);
+
+        return placeType;
     }
 }
