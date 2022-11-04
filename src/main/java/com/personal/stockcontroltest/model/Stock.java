@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "stock")
@@ -28,6 +29,9 @@ public class Stock {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_type_id")
     private StockType stockType;
+
+    @ManyToMany(mappedBy = "allergenToStock")
+    private Set<Allergen> allergenSet;
 
     public Stock() {
 
@@ -78,6 +82,14 @@ public class Stock {
 
     public void setStockType(StockType stockType) {
         this.stockType = stockType;
+    }
+
+    public Set<Allergen> getAllergenSet() {
+        return allergenSet;
+    }
+
+    public void setAllergenSet(Set<Allergen> allergenSet) {
+        this.allergenSet = allergenSet;
     }
 
     @Override

@@ -27,9 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class StockControllerTest {
-    private static final String placeTypeTestNaming = "TestPlaceType";
-    private static final String stockTypeTestNaming = "TestStockType";
-    private static final String stockTestNaming = "TestStock";
+    private static final String PLACE_TYPE_TEST_NAMING = "TestPlaceType";
+    private static final String STOCK_TYPE_TEST_NAMING = "TestStockType";
+    private static final String STOCK_TEST_NAMING = "TestStock";
+    private static final String URL = "/stock/";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -53,7 +54,7 @@ public class StockControllerTest {
         createStock(testType + 2, true);
 
         this.mockMvc
-                .perform(get("/stock")
+                .perform(get(URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -68,16 +69,16 @@ public class StockControllerTest {
         Stock stock = createStock(testType, true);
 
         this.mockMvc
-                .perform(get("/stock/" + stock.getId())
+                .perform(get(URL + stock.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + stockTestNaming))
+                .andExpect(jsonPath("$.name").value(testType + STOCK_TEST_NAMING))
                 .andExpect(jsonPath("$.checkup_date").value(stock.getCheckup_date().toString()))
-                .andExpect(jsonPath("$.placeType.name").value(testType + placeTypeTestNaming))
-                .andExpect(jsonPath("$.stockType.name").value(testType + stockTypeTestNaming))
+                .andExpect(jsonPath("$.placeType.name").value(testType + PLACE_TYPE_TEST_NAMING))
+                .andExpect(jsonPath("$.stockType.name").value(testType + STOCK_TYPE_TEST_NAMING))
                 .andExpect(jsonPath("$.placeType.id").isNotEmpty())
                 .andReturn();
     }
@@ -88,14 +89,14 @@ public class StockControllerTest {
         Stock stock = createStock(testType, false);
 
         this.mockMvc
-                .perform(post("/stock")
+                .perform(post(URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(stock))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + stockTestNaming))
+                .andExpect(jsonPath("$.name").value(testType + STOCK_TEST_NAMING))
                 .andExpect(jsonPath("$.checkup_date").value(stock.getCheckup_date().toString()))
                 .andExpect(jsonPath("$.placeType.id").isNotEmpty())
                 .andReturn();
@@ -113,7 +114,7 @@ public class StockControllerTest {
         updatedStock.setStockType(stock.getStockType());
 
         this.mockMvc
-                .perform(put("/stock/" + stock.getId())
+                .perform(put(URL + stock.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedStock))
@@ -133,7 +134,7 @@ public class StockControllerTest {
         String tempId = String.valueOf(stockRepository.findAll().get(0).getId());
 
         this.mockMvc
-                .perform(delete("/stock/" + tempId)
+                .perform(delete(URL + tempId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -143,15 +144,15 @@ public class StockControllerTest {
 
     private Stock createStock(String testType, Boolean saveStock) {
         PlaceType placeType = new PlaceType();
-        placeType.setName(testType + placeTypeTestNaming);
+        placeType.setName(testType + PLACE_TYPE_TEST_NAMING);
         placeTypeRepository.save(placeType);
 
         StockType stockType = new StockType();
-        stockType.setName(testType + stockTypeTestNaming);
+        stockType.setName(testType + STOCK_TYPE_TEST_NAMING);
         stockTypeRepository.save(stockType);
 
         Stock stock = new Stock();
-        stock.setName(testType + stockTestNaming);
+        stock.setName(testType + STOCK_TEST_NAMING);
         Date date = new Date(System.currentTimeMillis());
         stock.setCheckup_date(date);
 

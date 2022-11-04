@@ -21,7 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class StockTypeControllerTest {
-    private static final String stockTypeTestNaming = "TestStockType";
+    private static final String STOCK_TYPE_TEST_NAMING = "TestStockType";
+    private static final String URL = "/stock_type/";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -41,7 +42,7 @@ public class StockTypeControllerTest {
         createStockType(testType + 2, true);
 
         this.mockMvc
-                .perform(get("/stock_type")
+                .perform(get(URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -57,13 +58,13 @@ public class StockTypeControllerTest {
         StockType stockType = createStockType(testType, true);
 
         this.mockMvc
-                .perform(get("/stock_type/" + stockType.getId())
+                .perform(get(URL + stockType.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + stockTypeTestNaming))
+                .andExpect(jsonPath("$.name").value(testType + STOCK_TYPE_TEST_NAMING))
                 .andReturn();
     }
 
@@ -73,14 +74,14 @@ public class StockTypeControllerTest {
         StockType stockType = createStockType(testType, false);
 
         this.mockMvc
-                .perform(post("/stock_type")
+                .perform(post(URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(stockType))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + stockTypeTestNaming))
+                .andExpect(jsonPath("$.name").value(testType + STOCK_TYPE_TEST_NAMING))
                 .andReturn();
     }
 
@@ -93,7 +94,7 @@ public class StockTypeControllerTest {
         updatedStockType.setName("updateTestStockTypeModified");
 
         this.mockMvc
-                .perform(put("/stock_type/" + stockType.getId())
+                .perform(put(URL + stockType.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedStockType))
@@ -112,7 +113,7 @@ public class StockTypeControllerTest {
         String tempId = String.valueOf(stockTypeRepository.findAll().get(0).getId());
 
         this.mockMvc
-                .perform(delete("/stock_type/" + tempId)
+                .perform(delete(URL + tempId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -122,7 +123,7 @@ public class StockTypeControllerTest {
 
     private StockType createStockType(String testType, Boolean saveStockType) {
         StockType stockType = new StockType();
-        stockType.setName(testType + stockTypeTestNaming);
+        stockType.setName(testType + STOCK_TYPE_TEST_NAMING);
         if(saveStockType) stockTypeRepository.save(stockType);
 
         return stockType;

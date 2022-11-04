@@ -1,8 +1,8 @@
 package com.personal.stockcontroltest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.personal.stockcontroltest.model.PlaceType;
-import com.personal.stockcontroltest.repository.PlaceTypeRepository;
+import com.personal.stockcontroltest.model.Allergen;
+import com.personal.stockcontroltest.repository.AllergenRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,36 +13,33 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class PlaceTypeControllerTest {
-    private static final String PLACE_TYPE_TEST_NAMING = "TestPlaceType";
-    private static final String URL = "/place_type/";
+public class AllergenControllerTest {
+    private static final String ALLERGEN_TEST_NAMING = "AllergenType";
+    private static final String URL = "/allergen/";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private PlaceTypeRepository placeTypeRepository;
+    private AllergenRepository allergenRepository;
 
     @After
     public void tearDown() {
-        placeTypeRepository.deleteAll();
+        allergenRepository.deleteAll();
     }
 
     @Test
     public void getAllTest() throws Exception {
         String testType = "getAll";
-        createPlaceType(testType, true);
-        createPlaceType(testType + 2, true);
+        createAllergen(testType, true);
+        createAllergen(testType + 2, true);
 
         this.mockMvc
                 .perform(get(URL)
@@ -58,62 +55,62 @@ public class PlaceTypeControllerTest {
     @Test
     public void getByIdTest() throws Exception {
         String testType = "getById";
-        PlaceType placeType = createPlaceType(testType, true);
+        Allergen allergen = createAllergen(testType, true);
 
         this.mockMvc
-                .perform(get(URL + placeType.getId())
+                .perform(get(URL + allergen.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + PLACE_TYPE_TEST_NAMING))
+                .andExpect(jsonPath("$.name").value(testType + ALLERGEN_TEST_NAMING))
                 .andReturn();
     }
 
     @Test
     public void createTest() throws Exception {
         String testType = "create";
-        PlaceType placeType = createPlaceType(testType, false);
+        Allergen allergen = createAllergen(testType, false);
 
         this.mockMvc
                 .perform(post(URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(placeType))
+                        .content(objectMapper.writeValueAsString(allergen))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(testType + PLACE_TYPE_TEST_NAMING))
+                .andExpect(jsonPath("$.name").value(testType + ALLERGEN_TEST_NAMING))
                 .andReturn();
     }
 
     @Test
     public void updateTest() throws Exception {
         String testType = "update";
-        PlaceType placeType = createPlaceType(testType, true);
+        Allergen allergen = createAllergen(testType, true);
 
-        PlaceType updatedPlaceType = new PlaceType();
-        updatedPlaceType.setName("updateTestPlaceTypeModified");
+        Allergen updatedAllergen = new Allergen();
+        updatedAllergen.setName("updateTestAllergenModified");
 
         this.mockMvc
-                .perform(put(URL + placeType.getId())
+                .perform(put(URL + allergen.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedPlaceType))
+                        .content(objectMapper.writeValueAsString(updatedAllergen))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value("updateTestPlaceTypeModified"))
+                .andExpect(jsonPath("$.name").value("updateTestAllergenModified"))
                 .andReturn();
     }
 
     @Test
     public void deleteTest() throws Exception {
         String testType = "delete";
-        createPlaceType(testType, true);
+        createAllergen(testType, true);
 
-        String tempId = String.valueOf(placeTypeRepository.findAll().get(0).getId());
+        String tempId = String.valueOf(allergenRepository.findAll().get(0).getId());
 
         this.mockMvc
                 .perform(delete(URL + tempId)
@@ -124,11 +121,11 @@ public class PlaceTypeControllerTest {
                 .andReturn();
     }
 
-    private PlaceType createPlaceType(String testType, Boolean savePlaceType) {
-        PlaceType placeType = new PlaceType();
-        placeType.setName(testType + PLACE_TYPE_TEST_NAMING);
-        if(savePlaceType) placeTypeRepository.save(placeType);
+    private Allergen createAllergen(String testType, Boolean saveAllergen) {
+        Allergen allergen = new Allergen();
+        allergen.setName(testType + ALLERGEN_TEST_NAMING);
+        if(saveAllergen) allergenRepository.save(allergen);
 
-        return placeType;
+        return allergen;
     }
 }
